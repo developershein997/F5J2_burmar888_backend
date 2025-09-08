@@ -34,10 +34,15 @@ class GSCPlusProviderController extends Controller
 
     public function gameTypes()
     {
-        $types = GameType::with(['products' => function ($query) {
-            $query->where('status', 1);
-            $query->orderBy('order', 'asc');
-        }])->where('status', 1)->get();
+        $cacheKey = 'game_types_all';
+
+        $types = Cache::remember($cacheKey, now()->addHours(24), function () {
+            return GameType::with(['products' => function ($query) {
+                $query->where('status', 1)
+                    ->orderBy('order', 'asc');
+            }])->where('status', 1)
+            ->get();
+        });
 
         return $this->success(GameTypeResource::collection($types));
     }
