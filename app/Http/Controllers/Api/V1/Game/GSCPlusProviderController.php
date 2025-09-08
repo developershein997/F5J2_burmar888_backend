@@ -57,7 +57,7 @@ class GSCPlusProviderController extends Controller
 
     $cacheKey = "providers_{$type}";
 
-    $providers = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($type) {
+    $providers = Cache::remember($cacheKey, now()->addDays(1), function () use ($type) {
         return GameType::with(['products' => function ($query) {
             $query->where('game_list_status', 1)
                   ->orderBy('order', 'asc');
