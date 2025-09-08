@@ -26,6 +26,7 @@ use App\Models\PaymentType;
 use App\Traits\HttpResponses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class GSCPlusProviderController extends Controller
 {
@@ -43,15 +44,33 @@ class GSCPlusProviderController extends Controller
 
     public function providers($type)
     {
-        $providers = GameType::with(['products' => function ($query) {
-            $query->where('game_list_status', 1);
-            $query->orderBy('order', 'asc');
-        }])->where('code', $type)->where('status', 1)->first();
-        if ($providers) {
-            return $this->success(new GameProviderResource($providers));
-        } else {
-            return $this->error('', 'Providers Not Found', 404);
-        }
+        // $providers = GameType::with(['products' => function ($query) {
+        //     $query->where('game_list_status', 1);
+        //     $query->orderBy('order', 'asc');
+        // }])->where('code', $type)->where('status', 1)->first();
+        // if ($providers) {
+        //     return $this->success(new GameProviderResource($providers));
+        // } else {
+        //     return $this->error('', 'Providers Not Found', 404);
+        // }
+
+
+    $cacheKey = "providers_{$type}";
+
+    $providers = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($type) {
+        return GameType::with(['products' => function ($query) {
+            $query->where('game_list_status', 1)
+                  ->orderBy('order', 'asc');
+        }])->where('code', $type)
+          ->where('status', 1)
+          ->first();
+    });
+
+    if ($providers) {
+        return $this->success(new GameProviderResource($providers));
+    } else {
+        return $this->error('', 'Providers Not Found', 404);
+    }
     }
 
     public function gameLists($type, $provider, Request $request)

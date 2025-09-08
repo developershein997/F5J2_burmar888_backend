@@ -119,7 +119,7 @@ Route::get('contact', [ContactController::class, 'get']);
 
 // games
 Route::get('/game_types', [GSCPlusProviderController::class, 'gameTypes']);
-Route::get('/providers/{type}', [GSCPlusProviderController::class, 'providers']);
+// Route::get('/providers/{type}', [GSCPlusProviderController::class, 'providers']);
 Route::get('/game_lists/{type}/{provider}', [GSCPlusProviderController::class, 'gameLists']);
 
 Route::get('/game_lists/{type}/{productcode}', [GSCPlusProviderController::class, 'NewgameLists']);
@@ -172,3 +172,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/digitbet/history', [DigitBetController::class, 'history']); // Endpoint for getting bet history
     Route::post('/digit-slot/bet', [DigitSlotController::class, 'bet']);
 });
+
+Route::get('/providers/{type}', [GSCPlusProviderController::class, 'providers']);
